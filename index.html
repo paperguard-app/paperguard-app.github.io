@@ -444,7 +444,7 @@ code {
   gap: 14px;
 }
 @media (max-width: 840px) {
-  .Grid3 { grid-template-columns: 1fr; }
+  .Grid3 { grid-template-columns: minmax(0, 1fr); }
 }
 .Card {
   background: var(--bg-card);
@@ -454,7 +454,9 @@ code {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
+.Card h3 { overflow-wrap: anywhere; }
 .Card-sage { border-top: 2.5px solid var(--sage); }
 .Card-accent { border-top: 2.5px solid var(--accent-bg); }
 .Card-vermilion { border-top: 2.5px solid var(--vermilion); }
@@ -559,6 +561,8 @@ code {
   font-size: 12px;
   line-height: 1.5;
   overflow-x: auto;
+  max-width: 100%;
+  min-width: 0;
   white-space: pre;
   color: var(--ink);
   margin-top: 4px;
