@@ -12,33 +12,33 @@ try {
   }
 } catch (_) {}
 </script>
-<title>PaperGuard — Pre-Submission BibTeX, LaTeX Formula &amp; Table Consistency Workbench</title>
-<meta name="description" content="Deterministic pylatexenc AST formula guard, five-source lossless BibTeX forensics, and cell-bound table verification. Zero pip install, offline-first local app for macOS, Windows, Claude Code, Antigravity &amp; Cursor.">
+<title>PaperGuard — A calm pre-submission guard for LaTeX &amp; Markdown</title>
+<meta name="description" content="Verify citations, lock every equation, and catch table contradictions — locally, before Reviewer 2 does. Zero pip install, offline-first for macOS, Windows, Claude Code, Antigravity &amp; Cursor.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="PaperGuard — Archival-Grade Verification for LaTeX &amp; Markdown Papers">
-<meta property="og:description" content="Catch retracted DOIs, mutated formulas, and table-vs-prose contradictions before Reviewer 2 does. Free MIT local app for Mac/Win &amp; AI IDEs.">
+<meta property="og:title" content="PaperGuard — A calm pre-submission guard for LaTeX &amp; Markdown">
+<meta property="og:description" content="Verify citations, lock every equation, and catch table contradictions — locally, before Reviewer 2 does.">
 <meta property="og:url" content="https://paperguard-app.github.io/">
 <meta property="og:image" content="https://paperguard-app.github.io/assets/paperguard-hero.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="PaperGuard — Pre-Submission Guard for LaTeX &amp; Markdown">
-<meta name="twitter:description" content="Zero pip install. Vendored MIT pylatexenc AST + 5-source BibTeX forensics + offline 4-Lens Word-Diff Studio.">
+<meta name="twitter:description" content="Verify citations, lock formulas, and catch table contradictions offline.">
 <meta name="twitter:image" content="https://paperguard-app.github.io/assets/paperguard-hero.png">
 <style>
 :root {
   color-scheme: light dark;
   --bg-canvas: light-dark(#FAF8F3, #141311);
-  --bg-surface: light-dark(#EFECE4, #1C1B18);
-  --bg-card: light-dark(#FFFFFF, #22201C);
+  --bg-surface: light-dark(#F2EFE8, #1C1B18);
+  --bg-card: light-dark(#FFFFFF, #1F1E1A);
   --ink: light-dark(#181715, #F2EFE9);
-  --ink-soft: light-dark(#3A3631, #D4CEC2);
-  --ink-meta: light-dark(#4A453E, #C2BBAE);
-  --hairline: light-dark(#D8D2C5, #3B3831);
+  --ink-soft: light-dark(#524D45, #B8B1A5);
+  --ink-meta: light-dark(#767066, #8F897E);
+  --hairline: light-dark(#E2DDD2, #2F2C26);
   --vermilion: light-dark(#9B261B, #F5988E);
-  --vermilion-bg: light-dark(#FDF2F0, rgba(245,152,142,0.14));
+  --vermilion-bg: light-dark(#FDF2F0, rgba(245,152,142,0.13));
   --ochre: light-dark(#754708, #F4C478);
-  --ochre-bg: light-dark(#FCF5E8, rgba(244,196,120,0.14));
+  --ochre-bg: light-dark(#FCF5E8, rgba(244,196,120,0.13));
   --sage: light-dark(#1B543C, #82DAB0);
-  --sage-bg: light-dark(#EDF6F1, rgba(130,218,176,0.14));
+  --sage-bg: light-dark(#EDF6F1, rgba(130,218,176,0.13));
   --accent-bg: light-dark(#1D3E53, #A8D0EC);
   --accent-fg: light-dark(#FAF8F3, #141311);
   --focus-ring: light-dark(#1D3E53, #A8D0EC);
@@ -46,6 +46,7 @@ try {
   --del-fg: light-dark(#8C1D13, #F8ACA3);
   --ins-bg: light-dark(#E4F3EB, rgba(130,218,176,0.18));
   --ins-fg: light-dark(#154732, #9CE5C2);
+  --window-shadow: light-dark(0 24px 60px rgba(24,23,21,0.07), 0 28px 70px rgba(0,0,0,0.48));
   --serif: "Iowan Old Style", "Charter", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
   --mono: "SF Mono", "JetBrains Mono", "Menlo", ui-monospace, monospace;
@@ -59,1060 +60,917 @@ body {
   background: var(--bg-canvas);
   color: var(--ink);
   font-family: var(--sans);
-  line-height: 1.56;
+  font-size: 15.5px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   max-width: 100%;
   overflow-x: clip;
 }
 h1, h2, h3 {
   font-family: var(--serif);
-  font-weight: 600;
+  font-weight: 500;
   text-wrap: balance;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.015em;
 }
 p { text-wrap: pretty; }
-a { color: var(--accent-bg); }
-:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; border-radius: 3px; }
 code {
   font-family: var(--mono);
-  font-size: 0.87em;
-  background: var(--bg-surface);
-  border: 1px solid var(--hairline);
-  border-radius: 3px;
-  padding: 0.05em 0.32em;
+  font-size: 0.86em;
+  color: var(--ink);
 }
 
-.wrap {
-  max-width: 1180px;
+/* Whisper-quiet top bar */
+.nav {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 26px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.brand {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+.nav-links a, .nav-links button {
+  text-decoration: none;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.15s ease;
+}
+.nav-links a:hover, .nav-links button:hover { color: var(--ink); }
+@media (max-width: 520px) {
+  .nav-links { gap: 14px; font-size: 13px; }
+}
+
+/* Main centered rhythm */
+main {
+  max-width: 920px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-/* Studio Masthead */
-.Masthead {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  background: var(--bg-canvas);
-  border-bottom: 1px solid var(--hairline);
+/* 1. Typora-quiet Hero */
+.hero {
+  text-align: center;
+  padding: 84px 0 56px;
 }
-.Masthead-inner {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 10px 24px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
+@media (max-width: 640px) {
+  .hero { padding: 54px 0 40px; }
 }
-.Masthead-left {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  text-decoration: none;
-  color: var(--ink);
+.hero h1 {
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 1.13;
+  max-width: 17ch;
+  margin: 0 auto 20px;
 }
-.Masthead-title {
-  font-family: var(--serif);
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-.Badge {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 3px;
-  background: var(--accent-bg);
-  color: var(--accent-fg);
-  letter-spacing: 0.02em;
-}
-.Badge-muted {
-  background: var(--bg-surface);
-  color: var(--ink-meta);
-  border: 1px solid var(--hairline);
-}
-.NavTabs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2px;
-}
-.NavTab {
-  font-size: 13px;
-  font-weight: 500;
+.hero-sub {
+  font-size: clamp(16px, 1.8vw, 18px);
   color: var(--ink-soft);
-  text-decoration: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  border: 1px solid transparent;
+  max-width: 46ch;
+  margin: 0 auto 32px;
+  line-height: 1.6;
 }
-.NavTab:hover {
-  color: var(--ink);
-  background: var(--bg-surface);
-}
-.ToolbarRight {
+.actions {
   display: flex;
-  align-items: center;
-  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
 }
-
-/* Studio Action Buttons */
-.Btn {
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 7px 14px;
-  border-radius: 5px;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 6px;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: none;
   border: 1px solid var(--hairline);
   background: var(--bg-card);
   color: var(--ink);
-  font-family: var(--sans);
-  font-size: 13.5px;
-  font-weight: 600;
-  text-decoration: none;
   cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.14s ease, border-color 0.14s ease;
+  transition: border-color 0.16s ease, background-color 0.16s ease, opacity 0.16s ease;
 }
-.Btn:hover {
-  background: var(--bg-surface);
-  border-color: var(--ink-meta);
-}
-.Btn-accent {
+.btn:hover { border-color: var(--ink-meta); background: var(--bg-surface); }
+.btn-primary {
   background: var(--accent-bg);
   color: var(--accent-fg);
   border-color: var(--accent-bg);
 }
-.Btn-accent:hover {
-  background: var(--accent-bg);
-  border-color: var(--accent-bg);
-  opacity: 0.92;
-}
-.Btn-vermilion {
-  background: var(--vermilion);
-  color: #FAF8F3;
-  border-color: var(--vermilion);
-}
-:root:has(> head > meta[name="color-scheme"][content="dark"]) .Btn-vermilion {
-  color: #141311;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .Btn-vermilion {
-    color: #141311;
-  }
-}
-.Btn-vermilion:hover {
-  background: var(--vermilion);
-  border-color: var(--vermilion);
-  opacity: 0.92;
-}
-.Btn-sm {
-  min-height: 32px;
-  padding: 4px 10px;
-  font-size: 12.5px;
-}
-
-/* Asymmetric Editorial Hero */
-.Hero {
-  padding: 44px 0 36px;
-  border-bottom: 1px solid var(--hairline);
-}
-.HeroGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 36px;
-  align-items: center;
-}
-@media (max-width: 920px) {
-  .HeroGrid { grid-template-columns: 1fr; gap: 28px; }
-}
-.Kicker {
-  font-family: var(--mono);
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--sage);
-  margin-bottom: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.Kicker-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--sage);
+.btn-primary:hover { background: var(--accent-bg); border-color: var(--accent-bg); opacity: 0.9; }
+.quiet-link {
   display: inline-block;
-}
-.Hero h1 {
-  font-size: clamp(30px, 3.6vw, 44px);
-  line-height: 1.15;
-  margin-bottom: 16px;
-  color: var(--ink);
-}
-.HeroLead {
-  font-size: 15.5px;
-  color: var(--ink-soft);
-  max-width: 54ch;
-  margin-bottom: 22px;
-}
-.CtaRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin-bottom: 16px;
-}
-.MetaStrip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  font-family: var(--mono);
-  font-size: 11.5px;
+  font-size: 13.5px;
   color: var(--ink-meta);
-  padding-top: 12px;
-  border-top: 1px solid var(--hairline);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
+.quiet-link:hover { color: var(--ink); border-bottom-color: var(--ink-meta); }
 
-/* Authentic PaperGuard Studio Specimen Card */
-.Specimen {
+/* 2. Interactive Document Window */
+.stage-section {
+  padding-bottom: 88px;
+}
+.doc-window {
+  max-width: 800px;
+  margin: 0 auto;
   background: var(--bg-card);
   border: 1px solid var(--hairline);
-  border-radius: 6px;
+  border-radius: 10px;
+  box-shadow: var(--window-shadow);
   overflow: hidden;
 }
-.SpecimenBar {
+.win-chrome {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  padding: 9px 14px;
-  background: var(--bg-surface);
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 18px;
   border-bottom: 1px solid var(--hairline);
+  background: var(--bg-surface);
+  min-height: 46px;
+}
+.win-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.win-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background: var(--bg-canvas);
+}
+
+/* Accessible single-row scrolling tablist (modern-web-guidance: tabs) */
+.tablist {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  align-items: stretch;
+}
+.tablist::-webkit-scrollbar { display: none; }
+.tab {
+  position: relative;
+  flex: none;
+  background: none;
+  border: 0;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-meta);
+  padding: 13px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] {
+  color: var(--ink);
+}
+.tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 8px 0;
+  border-block-end: 2px solid var(--accent-bg);
+}
+.win-file {
   font-family: var(--mono);
   font-size: 11.5px;
   color: var(--ink-meta);
+  white-space: nowrap;
 }
-.SpecimenTitle {
-  font-weight: 600;
-  color: var(--ink);
+@media (max-width: 600px) {
+  .win-dots, .win-file { display: none; }
+  .win-chrome { justify-content: center; padding: 0 10px; }
 }
-.SpecimenBody {
-  padding: 14px;
+
+/* Progress hairline for gentle auto-advance */
+.progress-track {
+  height: 1px;
+  background: transparent;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-bg);
+  opacity: 0.45;
+  transition: width 0.2s linear;
+}
+
+/* Panels: NEVER style padding/border directly on [role="tabpanel"] because of hidden="until-found" */
+.stage-panels {
+  display: grid;
+}
+.stage-panels > [role="tabpanel"] {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.panel-inner {
+  padding: 34px 36px 30px;
+  min-height: 270px;
   display: flex;
   flex-direction: column;
-  gap: 11px;
-}
-.ScoreStrip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 7px;
-}
-@media (max-width: 540px) {
-  .ScoreStrip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-.ScoreBox {
-  background: var(--bg-canvas);
-  border: 1px solid var(--hairline);
-  border-radius: 5px;
-  padding: 8px 10px;
-}
-.ScoreVal {
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.ScoreLbl {
-  font-size: 11.5px;
-  color: var(--ink-meta);
-  margin-top: 2px;
-}
-.c-sage { color: var(--sage); }
-.c-vermilion { color: var(--vermilion); }
-.c-ochre { color: var(--ochre); }
-.c-accent { color: var(--accent-bg); }
-
-.DiffCard {
-  background: var(--bg-canvas);
-  border: 1px solid var(--hairline);
-  border-left: 3px solid var(--sage);
-  border-radius: 5px;
-  padding: 10px 12px;
-}
-.DiffMeta {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-meta);
-  margin-bottom: 6px;
+  gap: 22px;
+  animation: fadeSlide 0.28s ease;
 }
-.DiffText {
+@media (max-width: 600px) {
+  .panel-inner { padding: 24px 20px 22px; min-height: 290px; }
+}
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel-inner { animation: none; }
+  .progress-bar { display: none; }
+}
+
+.doc-prose {
   font-family: var(--serif);
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: clamp(17px, 2vw, 19.5px);
+  line-height: 1.72;
   color: var(--ink);
 }
-.DiffText del {
+.doc-prose del {
   background: var(--del-bg);
   color: var(--del-fg);
   text-decoration: line-through;
-  padding: 0 3px;
-  border-radius: 2px;
+  padding: 1px 4px;
+  border-radius: 3px;
 }
-.DiffText ins {
+.doc-prose ins {
   background: var(--ins-bg);
   color: var(--ins-fg);
   text-decoration: none;
-  padding: 0 3px;
-  border-radius: 2px;
-}
-.MathLock {
-  display: inline-block;
-  margin-top: 6px;
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 2px 7px;
+  padding: 1px 4px;
   border-radius: 3px;
-  background: var(--sage-bg);
-  color: var(--sage);
-  border: 1px solid var(--hairline);
 }
-
-.AlertCard {
-  background: var(--vermilion-bg);
+.eq-line {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16.5px;
+  text-align: center;
+  padding: 14px 16px;
   border: 1px solid var(--hairline);
-  border-left: 3px solid var(--vermilion);
-  border-radius: 5px;
-  padding: 9px 12px;
-  font-size: 12.5px;
+  border-radius: 6px;
+  background: var(--bg-canvas);
   color: var(--ink);
+  overflow-x: auto;
 }
-.AlertHead {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--vermilion);
-  margin-bottom: 3px;
-}
-
-/* Section Rhythm */
-.Section {
-  padding: 40px 0;
-  border-bottom: 1px solid var(--hairline);
-}
-.Section:last-of-type { border-bottom: 0; }
-.SectionHead {
+.seal-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: baseline;
-  gap: 8px 24px;
-  margin-bottom: 20px;
-}
-.SectionHead h2 {
-  font-size: clamp(22px, 2.6vw, 29px);
-  line-height: 1.22;
-}
-.SectionHead p {
-  color: var(--ink-soft);
-  font-size: 14.5px;
-  max-width: 64ch;
-  margin-top: 4px;
-}
-.SectionNum {
-  font-family: var(--mono);
-  font-size: 11.5px;
-  color: var(--ink-meta);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-/* 3-Column Editorial Cards */
-.Grid3 {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-@media (max-width: 840px) {
-  .Grid3 { grid-template-columns: minmax(0, 1fr); }
-}
-.Card {
-  background: var(--bg-card);
-  border: 1px solid var(--hairline);
-  border-radius: 6px;
-  padding: 18px 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-.Card h3 { overflow-wrap: anywhere; }
-.Card-sage { border-top: 2.5px solid var(--sage); }
-.Card-accent { border-top: 2.5px solid var(--accent-bg); }
-.Card-vermilion { border-top: 2.5px solid var(--vermilion); }
-.CardTag {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink-meta);
-}
-.Card h3 {
-  font-size: 18px;
-  line-height: 1.25;
-}
-.Card p {
-  font-size: 14px;
-  color: var(--ink-soft);
-}
-
-/* Studio Showcase Frame */
-.Showcase {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
-  gap: 20px;
-  align-items: stretch;
-}
-@media (max-width: 880px) {
-  .Showcase { grid-template-columns: 1fr; }
-}
-.FigureFrame {
-  background: var(--bg-card);
-  border: 1px solid var(--hairline);
-  border-radius: 6px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.FigureFrame img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.FigureCap {
-  padding: 9px 14px;
-  background: var(--bg-surface);
+  align-items: center;
+  gap: 8px 16px;
+  padding-top: 16px;
   border-top: 1px solid var(--hairline);
   font-family: var(--mono);
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--ink-meta);
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
 }
-.ShowcaseAside {
-  background: var(--bg-card);
+.seal-ok { color: var(--sage); }
+.seal-err { color: var(--vermilion); }
+.seal-warn { color: var(--ochre); }
+
+/* BibTeX live specimen */
+.bib-block {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  background: var(--bg-canvas);
   border: 1px solid var(--hairline);
   border-radius: 6px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 16px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  color: var(--ink-soft);
 }
-.ShowcaseAside h3 {
-  font-size: 21px;
-  margin-bottom: 8px;
+.bib-del {
+  display: block;
+  background: var(--del-bg);
+  color: var(--del-fg);
+  margin: 2px -6px;
+  padding: 0 6px;
+  border-radius: 3px;
+  text-decoration: line-through;
 }
-.ShowcaseAside p {
+.bib-ins {
+  display: block;
+  background: var(--ins-bg);
+  color: var(--ins-fg);
+  margin: 2px -6px;
+  padding: 0 6px;
+  border-radius: 3px;
+}
+
+/* Mini Table specimen */
+.mini-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--bg-canvas);
+}
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+.mini-table th, .mini-table td {
+  padding: 9px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--hairline);
+  font-variant-numeric: tabular-nums;
+}
+.mini-table th { color: var(--ink-meta); font-weight: 500; }
+.mini-table tr:last-child td { border-bottom: 0; }
+.cell-flag {
+  background: var(--vermilion-bg);
+  color: var(--vermilion);
+  font-weight: 600;
+}
+.cell-pass {
+  background: var(--sage-bg);
+  color: var(--sage);
+  font-weight: 600;
+}
+.audit-note {
   font-size: 14px;
   color: var(--ink-soft);
-  margin-bottom: 12px;
+  padding-left: 14px;
+  border-left: 2px solid var(--vermilion);
 }
-.CheckList {
+
+.win-foot {
+  padding: 12px 20px;
+  border-top: 1px solid var(--hairline);
+  background: var(--bg-surface);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 16px;
+  font-size: 12.5px;
+  color: var(--ink-meta);
+}
+
+/* 3. Quiet Three-Point Principles (no heavy cards, just clean typography) */
+.principles {
+  padding: 20px 0 88px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px;
+}
+@media (max-width: 720px) {
+  .principles { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-bottom: 64px; }
+}
+.principle h2 {
+  font-size: 19px;
+  margin-bottom: 8px;
+}
+.principle p {
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+
+/* 4. Interactive Usage Switcher */
+.usage {
+  padding: 76px 0;
+  border-top: 1px solid var(--hairline);
+  text-align: center;
+}
+.section-title {
+  font-size: clamp(24px, 3vw, 32px);
+  margin-bottom: 10px;
+}
+.section-lead {
+  color: var(--ink-soft);
+  font-size: 15px;
+  margin-bottom: 28px;
+}
+.usage-card {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: left;
+  background: var(--bg-card);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.usage-bar {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--bg-surface);
+  padding: 0 12px;
+}
+.usage-panels {
+  display: grid;
+}
+.usage-panels > [role="tabpanel"] {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.usage-inner {
+  padding: 28px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeSlide 0.22s ease;
+}
+@media (max-width: 560px) {
+  .usage-inner { padding: 22px 18px; }
+}
+.steps {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-size: 13.5px;
-  color: var(--ink);
+  gap: 12px;
+  font-size: 14.5px;
+  color: var(--ink-soft);
 }
-.CheckList li {
-  padding-left: 18px;
-  position: relative;
+.steps li {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
 }
-.CheckList li::before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  color: var(--sage);
-  font-weight: 700;
+.step-n {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-meta);
+  flex-shrink: 0;
 }
-
-/* Code blocks */
-.CodeBox {
+.cmd-block {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
   background: var(--bg-canvas);
   border: 1px solid var(--hairline);
-  border-radius: 5px;
-  padding: 10px 12px;
-  font-family: var(--mono);
-  font-size: 12px;
-  line-height: 1.5;
+  border-radius: 6px;
+  padding: 13px 15px;
   overflow-x: auto;
   max-width: 100%;
-  min-width: 0;
   white-space: pre;
   color: var(--ink);
-  margin-top: 4px;
 }
-.CopyBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 6px;
-}
-
-/* Responsive Comparison Table (modern-web-guidance: responsive-table) */
-.table-wrapper {
-  overflow: auto;
-  max-inline-size: 100%;
-  container-type: inline-size;
-  background: var(--bg-card);
-  border: 1px solid var(--hairline);
-  border-radius: 6px;
-}
-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  --label-2: "PaperGuard Lite (Free MIT)";
-  --label-3: "PaperGuard Pro ($29 One-Time)";
-}
-caption {
-  text-align: left;
-  padding: 12px 16px 8px;
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--ink);
-  border-bottom: 1px solid var(--hairline);
-  background: var(--bg-surface);
-}
-thead {
-  position: sticky;
-  inset-block-start: 0;
-  z-index: 2;
-}
-th, td {
-  padding: 11px 16px;
-  text-align: left;
-  border-bottom: 1px solid var(--hairline);
-  vertical-align: top;
-  font-size: 13.5px;
-}
-thead th {
-  background: var(--bg-surface);
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-meta);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-tbody th {
-  position: sticky;
-  inset-inline-start: 0;
-  background: var(--bg-card);
-  font-weight: 600;
-  color: var(--ink);
-}
-tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
-.cell-ok { color: var(--sage); font-weight: 600; }
-.cell-muted { color: var(--ink-meta); }
-
-@container (width < 620px) {
-  table, thead, tbody, tr, th, td { display: block; }
-  thead { display: none; }
-  tbody tr {
-    margin: 10px;
-    border: 1px solid var(--hairline);
-    border-radius: 5px;
-    overflow: hidden;
-  }
-  tbody th {
-    position: sticky;
-    inset-block-start: 0;
-    background: var(--bg-surface);
-    z-index: 1;
-  }
-  td:nth-child(2)::before {
-    content: var(--label-2) ": ";
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--ink-meta);
-  }
-  td:nth-child(3)::before {
-    content: var(--label-3) ": ";
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--ink-meta);
-  }
-}
-
-.ScopeNote {
-  margin-top: 12px;
-  padding: 10px 14px;
-  border-radius: 5px;
-  background: var(--bg-surface);
-  border: 1px solid var(--hairline);
-  font-size: 12.5px;
-  color: var(--ink-soft);
-}
-
-/* Final Dual Colophon CTA */
-.DualCta {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-@media (max-width: 760px) {
-  .DualCta { grid-template-columns: 1fr; }
-}
-.TierCard {
-  background: var(--bg-card);
-  border: 1px solid var(--hairline);
-  border-radius: 6px;
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 14px;
-}
-.TierCard-pro {
-  border-color: var(--accent-bg);
-  background: var(--bg-card);
-}
-.TierPrice {
-  font-family: var(--mono);
-  font-size: 24px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.TierSub {
-  font-size: 13.5px;
-  color: var(--ink-soft);
-}
-
-footer {
-  border-top: 1px solid var(--hairline);
-  background: var(--bg-surface);
-  padding: 22px 0;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  color: var(--ink-meta);
-}
-.FooterInner {
+.usage-foot {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  padding-top: 6px;
 }
-.FooterLinks {
+.tiny-note {
+  font-size: 12.5px;
+  color: var(--ink-meta);
+}
+
+/* 5. Single Editorial Studio Frame */
+.preview {
+  padding: 76px 0;
+  border-top: 1px solid var(--hairline);
+  text-align: center;
+}
+.preview-frame {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  box-shadow: var(--window-shadow);
+  background: var(--bg-card);
+  margin-bottom: 16px;
+}
+.preview-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.preview-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
+  justify-content: center;
+  gap: 8px 22px;
+  font-size: 13.5px;
+  color: var(--ink-meta);
 }
-.FooterLinks a {
+
+/* 6. Minimal Two-Column Editions */
+.editions {
+  padding: 76px 0 64px;
+  border-top: 1px solid var(--hairline);
+}
+.editions-head {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.tier-grid {
+  max-width: 760px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+@media (max-width: 660px) {
+  .tier-grid { grid-template-columns: minmax(0, 1fr); }
+}
+.tier {
+  background: var(--bg-card);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+}
+.tier-pro {
+  border-color: var(--accent-bg);
+}
+.tier-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.tier h3 { font-size: 22px; }
+.price {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.tier-desc {
+  font-size: 13.5px;
+  color: var(--ink-meta);
+  margin-bottom: 18px;
+}
+.tier-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 14px;
   color: var(--ink-soft);
+}
+.tier-list li {
+  padding-left: 18px;
+  position: relative;
+}
+.tier-list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--ink-meta);
+}
+.tier-pro .tier-list li::before {
+  content: "✓";
+  color: var(--sage);
+}
+
+/* Collapsible technical scope (keeps main surface serene) */
+.spec-details {
+  max-width: 760px;
+  margin: 24px auto 0;
+  border-top: 1px solid var(--hairline);
+  padding-top: 18px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+.spec-details summary {
+  cursor: pointer;
+  color: var(--ink-meta);
+  font-size: 13px;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.spec-details summary::-webkit-details-marker { display: none; }
+.spec-details summary::before {
+  content: "+";
+  font-family: var(--mono);
+  font-size: 14px;
+}
+.spec-details[open] summary::before { content: "−"; }
+.spec-body {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+  line-height: 1.65;
+}
+
+/* Single-line Colophon */
+footer {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px 24px 48px;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 12.5px;
+  color: var(--ink-meta);
+}
+.foot-links {
+  display: flex;
+  gap: 18px;
+}
+.foot-links a {
   text-decoration: none;
+  color: var(--ink-meta);
 }
-.FooterLinks a:hover {
-  color: var(--ink);
-  text-decoration: underline;
-}
+.foot-links a:hover { color: var(--ink); }
 </style>
 </head>
 <body>
-<header class="Masthead">
-  <div class="Masthead-inner">
-    <a class="Masthead-left" href="#">
-      <span class="Masthead-title">PaperGuard</span>
-      <span class="Badge">v2.5.0</span>
-    </a>
-    <nav class="NavTabs" aria-label="Primary navigation">
-      <a class="NavTab" href="#studio">Interactive Studio</a>
-      <a class="NavTab" href="#install">Mac &amp; Win App</a>
-      <a class="NavTab" href="#compare">Lite vs Pro</a>
-      <a class="NavTab" href="#privacy">Privacy</a>
-      <a class="NavTab" href="https://github.com/paperguard-app/paperguard" target="_blank" rel="noopener">GitHub</a>
-    </nav>
-    <div class="ToolbarRight">
-      <button type="button" id="themeToggle" class="Btn Btn-sm" aria-label="Switch paper or obsidian color theme">Obsidian</button>
-      <a class="Btn Btn-accent Btn-sm" href="https://zhangx2.gumroad.com/l/paperguard-pro" target="_blank" rel="noopener">Pro · $29</a>
-    </div>
-  </div>
+<header class="nav">
+  <a class="brand" href="#">PaperGuard</a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="#how">Install</a>
+    <a href="#editions">Editions</a>
+    <a href="https://github.com/paperguard-app/paperguard" target="_blank" rel="noopener">GitHub</a>
+    <button type="button" id="themeToggle" aria-label="Toggle Paper or Obsidian theme">Obsidian</button>
+  </nav>
 </header>
 
 <main>
-  <section class="Hero">
-    <div class="wrap HeroGrid">
-      <div>
-        <div class="Kicker"><span class="Kicker-dot" aria-hidden="true"></span>Archival Pre-Submission Verification · LaTeX &amp; Markdown</div>
-        <h1>Catch broken citations, mutated equations &amp; table contradictions before Reviewer 2 does.</h1>
-        <p class="HeroLead">
-          Deterministic <code>pylatexenc</code> AST verification, five-source <code>.bib</code> forensics, and an offline 4-Lens Word-Diff Studio—built for <strong>macOS, Windows, Claude Code, Antigravity &amp; Cursor</strong>.
-        </p>
-        <div class="CtaRow">
-          <a class="Btn Btn-accent" href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0.zip">
-            Download Lite Free (Mac / Win ZIP)
-          </a>
-          <a class="Btn" href="./demo-studio.html" target="_blank" rel="noopener">
-            Try Live 4-Lens Studio ↗
-          </a>
-          <a class="Btn Btn-vermilion" href="https://zhangx2.gumroad.com/l/paperguard-pro" target="_blank" rel="noopener">
-            Unlock Pro · $29 →
-          </a>
-        </div>
-        <div class="MetaStrip">
-          <span>0 pip install</span>
-          <span>Python 3.11+ stdlib + vendored pylatexenc 2.11</span>
-          <span>0 PaperGuard servers</span>
-          <span>MIT Lite · $29 One-Time Pro</span>
-        </div>
-      </div>
-
-      <aside class="Specimen" aria-label="PaperGuard Studio live verification specimen">
-        <div class="SpecimenBar">
-          <span class="SpecimenTitle">PaperGuard Studio · paper.tex → paper_polished.tex</span>
-          <span>SCHEMA 2.5 · OFFLINE</span>
-        </div>
-        <div class="SpecimenBody">
-          <div class="ScoreStrip">
-            <div class="ScoreBox">
-              <div class="ScoreVal c-sage">PASSED</div>
-              <div class="ScoreLbl">Formula AST Lock</div>
-            </div>
-            <div class="ScoreBox">
-              <div class="ScoreVal c-sage">4 Repaired</div>
-              <div class="ScoreLbl">Lossless .bib</div>
-            </div>
-            <div class="ScoreBox">
-              <div class="ScoreVal c-vermilion">2 Crit</div>
-              <div class="ScoreLbl">Table vs. Prose</div>
-            </div>
-            <div class="ScoreBox">
-              <div class="ScoreVal c-ochre">0 HTTP</div>
-              <div class="ScoreLbl">Local Loopback</div>
-            </div>
-          </div>
-
-          <div class="DiffCard">
-            <div class="DiffMeta">
-              <span>WORD-DIFF LENS · Section 2 (L42)</span>
-              <span class="c-sage">0 FORMULA DRIFT</span>
-            </div>
-            <div class="DiffText">
-              We <del>delve into a comprehensive tapestry of</del> <ins>analyze</ins> sparse spectral routing to reduce memory overhead without altering the attention kernel:
-            </div>
-            <span class="MathLock">✓ $A(Q,K,V)=\mathrm{softmax}(QK^\top/\sqrt{d_k})V$ · SHA-256 matched</span>
-          </div>
-
-          <div class="AlertCard">
-            <div class="AlertHead">CRITICAL · TABLE_PROSE_CONTRADICTION · paper_polished.tex:L78</div>
-            Prose claims <strong>94.2% accuracy</strong> and <strong>+8.96% latency</strong>, but <code>Table 1 [SparseRouter, Acc / Lat]</code> reports <strong>92.4%</strong> and <strong>120 → 90 ms (-25.0%)</strong>.
-          </div>
-        </div>
-      </aside>
+  <section class="hero">
+    <h1>A calm pre-submission guard for LaTeX &amp; Markdown.</h1>
+    <p class="hero-sub">Verify citations, lock every equation, and catch table contradictions — locally, before Reviewer 2 does.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0.zip">Download Free</a>
+      <a class="btn" href="https://zhangx2.gumroad.com/l/paperguard-pro" target="_blank" rel="noopener">PaperGuard Pro · $29</a>
     </div>
+    <a class="quiet-link" href="./demo-studio.html" target="_blank" rel="noopener">Try the interactive 4-Lens Studio in your browser →</a>
   </section>
 
-  <section class="Section" aria-labelledby="gates-heading">
-    <div class="wrap">
-      <div class="SectionHead">
-        <div>
-          <span class="SectionNum">01 · Deterministic Gates</span>
-          <h2 id="gates-heading">Three submission failures caught before camera-ready</h2>
-          <p>LLM prose polishing improves flow while quietly introducing hallucinated DOIs, corrupted math delimiters, and stale table numbers.</p>
+  <section class="stage-section" aria-label="Interactive verification preview">
+    <div class="doc-window" id="showcaseWindow">
+      <div class="win-chrome">
+        <div class="win-dots" aria-hidden="true">
+          <span class="win-dot"></span>
+          <span class="win-dot"></span>
+          <span class="win-dot"></span>
+        </div>
+        <div class="tablist" role="tablist" aria-label="Verification gates" data-tabs="showcase">
+          <button type="button" class="tab" role="tab" id="tab-formula" aria-selected="true" tabindex="0" data-file="paper.tex">Formula Lock</button>
+          <button type="button" class="tab" role="tab" id="tab-bib" aria-selected="false" tabindex="-1" data-file="references.bib">BibTeX Repair</button>
+          <button type="button" class="tab" role="tab" id="tab-table" aria-selected="false" tabindex="-1" data-file="table_1.tex">Table Audit</button>
+        </div>
+        <span class="win-file" id="winFile">paper.tex</span>
+      </div>
+      <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="showcaseProgress"></div></div>
+
+      <div class="stage-panels">
+        <div role="tabpanel" aria-labelledby="tab-formula" tabindex="0">
+          <div class="panel-inner">
+            <p class="doc-prose">
+              We <del>delve into a comprehensive tapestry of</del> <ins>analyze</ins> sparse spectral routing to reduce KV-cache overhead while preserving exact attention weights:
+            </p>
+            <div class="eq-line">
+              Attention(Q, K, V) = softmax(QK<sup>⊤</sup> / √d<sub>k</sub>) V
+            </div>
+            <div class="seal-row">
+              <span class="seal-ok">✓ SHA-256 Lock Passed · 0 Formula Drift</span>
+              <span>pylatexenc AST + stateful lexer</span>
+            </div>
+          </div>
+        </div>
+
+        <div role="tabpanel" aria-labelledby="tab-bib" hidden="until-found">
+          <div class="panel-inner">
+            <div class="bib-block">@inproceedings{hu2022lora,
+  title     = {LoRA: Low-Rank Adaptation of Large Language Models},
+  author    = {Hu, Edward J. and Shen, Yelong and Wallis, Phillip},
+<span class="bib-del">- journal   = {arXiv preprint arXiv:2106.09685}, year = {2021}</span><span class="bib-ins">+ booktitle = {ICLR}, year = {2022}, eprint = {2106.09685}</span>}</div>
+            <div class="seal-row">
+              <span class="seal-ok">✓ Lossless Span Patch · @string &amp; comments untouched</span>
+              <span>Crossref · DataCite · OpenAlex · DBLP · arXiv</span>
+            </div>
+          </div>
+        </div>
+
+        <div role="tabpanel" aria-labelledby="tab-table" hidden="until-found">
+          <div class="panel-inner">
+            <div class="mini-table-wrap">
+              <table class="mini-table">
+                <thead>
+                  <tr><th>Method</th><th>Accuracy</th><th>Latency</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Baseline</td><td>84.8%</td><td>120 ms</td></tr>
+                  <tr><td>SparseRouter (Ours)</td><td class="cell-flag">92.4%</td><td class="cell-pass">90 ms (−25.0%)</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="audit-note">
+              <strong>Line 78:</strong> Prose reports <code>94.2%</code> accuracy, contradicting <code>Table 1 [SparseRouter, Accuracy] = 92.4%</code>. Latency reduction (<code>−25%</code>) verified.
+            </p>
+            <div class="seal-row">
+              <span class="seal-err">1 Contradiction Pinpointed · 1 Metric Verified</span>
+              <span>Cell-bound absolute, % &amp; pp checks</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="Grid3">
-        <article class="Card Card-sage">
-          <span class="CardTag">Gate 01 · BibTeX Forensics</span>
-          <h3>Retracted DOIs &amp; lossless span patching</h3>
-          <p>Verifies citations across Crossref, DataCite (<code>10.48550/arXiv.*</code>), OpenAlex CC0 retraction guard, DBLP, and arXiv—with optional <code>bibtex</code> <code>.bbl</code> compilation checks. Untouched <code>@string</code>, comments, and macros stay byte-for-byte identical.</p>
-        </article>
-        <article class="Card Card-accent">
-          <span class="CardTag">Gate 02 · Formula AST Lock</span>
-          <h3>Polish prose without corrupting LaTeX</h3>
-          <p>Combines a stateful TeX lexer, vendored MIT <code>pylatexenc 2.11</code> AST cross-check, SHA-256 lockfiles, and optional <code>--fls</code> TeX recorder oracles to guarantee checked formulas, labels, and citations remain unchanged.</p>
-        </article>
-        <article class="Card Card-vermilion">
-          <span class="CardTag">Gate 03 · Cell-Bound Table Audit</span>
-          <h3>Pinpoint numeric drift by <code>Table [Row, Col]</code></h3>
-          <p>Masks LaTeX syntax via AST before verifying prose claims against exact table cells—covering absolute values, metric-bound relative <code>%</code> changes (<code>ms</code>, <code>GB</code>, <code>FPS</code>, <code>%</code>), independent <code>pp</code> deltas, and broken <code>\ref</code> labels.</p>
-        </article>
+
+      <div class="win-foot">
+        <span>0 pip install · 0 PaperGuard servers · Offline by default</span>
+        <a class="quiet-link" href="./demo-studio.html" target="_blank" rel="noopener">Open full 4-Lens Studio ↗</a>
       </div>
     </div>
   </section>
 
-  <section id="studio" class="Section" aria-labelledby="studio-heading">
-    <div class="wrap">
-      <div class="SectionHead">
-        <div>
-          <span class="SectionNum">02 · Live Browser Specimen</span>
-          <h2 id="studio-heading">Inspect the real 4-Lens Studio in your browser right now</h2>
-          <p>No account, no upload. Both live links below are genuine self-contained HTML reports generated directly by PaperGuard v2.5.0.</p>
-        </div>
-      </div>
-
-      <div class="Showcase">
-        <figure class="FigureFrame">
-          <img
-            src="assets/studio-pro-preview.png"
-            alt="PaperGuard Pro 4-Lens Obsidian Ink Word-Diff Studio showing Formula guard passed, Consistency, Diff, BibTeX, and Rebuttal lenses"
-            width="1440"
-            height="900"
-            fetchpriority="high"
-          >
-          <figcaption class="FigureCap">
-            <span>Obsidian Ink Theme · 4-Lens Word-Diff Studio</span>
-            <span>0 external HTTP requests · Print-safe</span>
-          </figcaption>
-        </figure>
-
-        <div class="ShowcaseAside">
-          <div>
-            <span class="Badge Badge-muted" style="display:inline-block;margin-bottom:10px">INTERACTIVE DEMO</span>
-            <h3>Built for calm, high-density manuscript review</h3>
-            <p>Designed around archival reading ergonomics so you can review a 3,000-line paper with keyboard navigation instead of scrolling raw git diffs.</p>
-            <ul class="CheckList">
-              <li><strong>Archival Paper &amp; Obsidian Ink</strong> WCAG AA accessible themes</li>
-              <li><strong>Word-level <code>&lt;del&gt;</code>/<code>&lt;ins&gt;</code> diffs</strong> with <code>j</code>/<code>k</code> keyboard jump &amp; context folding</li>
-              <li><strong>Four synchronized lenses</strong>: Consistency, Diff, BibTeX, and Rebuttal triage</li>
-              <li><strong>Single self-contained HTML file</strong> you can share with co-authors offline</li>
-            </ul>
-          </div>
-          <div class="CtaRow" style="margin-bottom:0">
-            <a class="Btn Btn-accent" href="./demo-studio.html" target="_blank" rel="noopener">Open Pro Studio Demo ↗</a>
-            <a class="Btn" href="./demo-lite.html" target="_blank" rel="noopener">Open Lite Audit Demo ↗</a>
-          </div>
-        </div>
-      </div>
-
-      <figure class="FigureFrame" style="margin-top:16px">
-        <img
-          src="assets/paperguard-hero.png"
-          alt="PaperGuard two-stage academic verification pipeline: Stage 1 BibTeX forensics and formula-guarded polishing, Stage 2 Reviewer-2 consistency and rebuttal audit"
-          width="1280"
-          height="720"
-          loading="lazy"
-        >
-        <figcaption class="FigureCap">
-          <span>Two-Stage Verification Architecture · PaperGuard v2.5.0</span>
-          <span>Stage 1: BibTeX + Formula Lock → Stage 2: Consistency + Rebuttal</span>
-        </figcaption>
-      </figure>
+  <section class="principles" aria-label="Core principles">
+    <div class="principle">
+      <h2>Local by design</h2>
+      <p>Runs strictly on <code>127.0.0.1</code> using Python 3.11+ stdlib and vendored <code>pylatexenc</code>. Unpublished drafts never touch a third-party server.</p>
+    </div>
+    <div class="principle">
+      <h2>Never overwrites source</h2>
+      <p>Every CLI and local app path refuses to overwrite declared manuscripts or multi-database <code>.bib</code> files. Repairs export cleanly alongside originals.</p>
+    </div>
+    <div class="principle">
+      <h2>Fits your editor</h2>
+      <p>Use the double-click Mac/Windows app on its own, or install skills directly into Claude Code, Antigravity, and Cursor in one click.</p>
     </div>
   </section>
 
-  <section id="install" class="Section" aria-labelledby="install-heading">
-    <div class="wrap">
-      <div class="SectionHead">
-        <div>
-          <span class="SectionNum">03 · Local App &amp; IDE Integration</span>
-          <h2 id="install-heading">Double-click on Mac or Windows—or wire straight into your AI IDE</h2>
-          <p>Every download ships with a loopback-only local browser app (drag &amp; drop files, one-click demo, native folder picker) plus safe IDE installers.</p>
+  <section id="how" class="usage" aria-labelledby="how-heading">
+    <h2 id="how-heading" class="section-title">Start in thirty seconds.</h2>
+    <p class="section-lead">Choose how you write — zero dependencies to install.</p>
+
+    <div class="usage-card">
+      <div class="usage-bar">
+        <div class="tablist" role="tablist" aria-label="Platform installation" data-tabs="usage">
+          <button type="button" class="tab" role="tab" id="tab-mac" aria-selected="true" tabindex="0">macOS</button>
+          <button type="button" class="tab" role="tab" id="tab-win" aria-selected="false" tabindex="-1">Windows</button>
+          <button type="button" class="tab" role="tab" id="tab-ide" aria-selected="false" tabindex="-1">Claude · Cursor · Antigravity</button>
         </div>
       </div>
 
-      <div class="Grid3">
-        <article class="Card">
-          <span class="CardTag">macOS · Double-Click App</span>
-          <h3>Start-PaperGuard-Mac.command</h3>
-          <p>Unzip the download and double-click <code>Start-PaperGuard-Mac.command</code>. Automatically finds Python 3.11+ across Homebrew, Conda, pyenv, or <code>uv</code> and opens the local workbench with native Finder folder selection.</p>
-          <p style="font-size:12.5px;color:var(--ink-meta)">First run if macOS Gatekeeper prompts: <em>System Settings → Privacy &amp; Security → Open Anyway</em>, or run <code>python3 paperguard_app.py</code>.</p>
-        </article>
+      <div class="usage-panels">
+        <div role="tabpanel" aria-labelledby="tab-mac" tabindex="0">
+          <div class="usage-inner">
+            <ol class="steps">
+              <li><span class="step-n">01</span><span>Download and unzip <code>PaperGuard-Lite-v2.5.0.zip</code>.</span></li>
+              <li><span class="step-n">02</span><span>Double-click <code>Start-PaperGuard-Mac.command</code> to open the local drag-and-drop workbench and one-click IDE installer.</span></li>
+            </ol>
+            <div class="usage-foot">
+              <span class="tiny-note">First run if Gatekeeper prompts: Privacy &amp; Security → Open Anyway, or <code>python3 paperguard_app.py</code>.</span>
+              <a class="btn btn-primary" style="min-height:38px;padding:0 16px;font-size:13.5px" href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0.zip">Download ZIP</a>
+            </div>
+          </div>
+        </div>
 
-        <article class="Card">
-          <span class="CardTag">Windows · Double-Click + PS1</span>
-          <h3>Start-PaperGuard-Win.bat</h3>
-          <p>Unzip and double-click <code>Start-PaperGuard-Win.bat</code> to launch the local drag-and-drop workbench, or install into Antigravity, Claude Code, and Cursor with native PowerShell:</p>
-          <div class="CodeBox">.\install.ps1 -Project C:\path\to\paper</div>
-        </article>
+        <div role="tabpanel" aria-labelledby="tab-win" hidden="until-found">
+          <div class="usage-inner">
+            <ol class="steps">
+              <li><span class="step-n">01</span><span>Download and extract <code>PaperGuard-Lite-v2.5.0.zip</code>.</span></li>
+              <li><span class="step-n">02</span><span>Double-click <code>Start-PaperGuard-Win.bat</code>, or run native PowerShell for direct IDE setup:</span></li>
+            </ol>
+            <div class="cmd-block">.\install.ps1 -Project C:\path\to\your\paper</div>
+            <div class="usage-foot">
+              <span class="tiny-note">Auto-detects Python 3.11+ via <code>py</code> or <code>python</code>.</span>
+              <a class="btn btn-primary" style="min-height:38px;padding:0 16px;font-size:13.5px" href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0.zip">Download ZIP</a>
+            </div>
+          </div>
+        </div>
 
-        <article class="Card">
-          <span class="CardTag">Claude Code · Antigravity · Cursor</span>
-          <h3>One-Command Git Install</h3>
-          <p>Clone the MIT repo and install with automatic <code>.orig.bak</code> / <code>.bak</code> safety backups and Cursor <code>.mdc</code> edit preservation:</p>
-          <div class="CodeBox" id="gitCmd">git clone https://github.com/paperguard-app/paperguard.git
+        <div role="tabpanel" aria-labelledby="tab-ide" hidden="until-found">
+          <div class="usage-inner">
+            <div class="cmd-block" id="gitCmd">git clone https://github.com/paperguard-app/paperguard.git
 cd paperguard
-./install.sh --project /path/to/paper</div>
-          <div class="CopyBar">
-            <span id="copyStatus" style="font-family:var(--mono);font-size:11.5px;color:var(--sage)" aria-live="polite"></span>
-            <button type="button" class="Btn Btn-sm" id="copyGitBtn">Copy Command</button>
+./install.sh --project /path/to/your/paper</div>
+            <div class="usage-foot">
+              <span class="tiny-note" id="copyStatus" aria-live="polite">Creates .orig.bak backups &amp; preserves custom Cursor .mdc rules.</span>
+              <button type="button" class="btn" id="copyGitBtn" style="min-height:36px;padding:0 14px;font-size:13px">Copy</button>
+            </div>
           </div>
-        </article>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="compare" class="Section" aria-labelledby="compare-heading">
-    <div class="wrap">
-      <div class="SectionHead">
-        <div>
-          <span class="SectionNum">04 · Editions</span>
-          <h2 id="compare-heading">PaperGuard Lite (Free MIT) vs. PaperGuard Pro ($29 One-Time)</h2>
-          <p>Start free with Lite to audit your draft today. Upgrade once for lossless BibTeX patching, formula lockfiles, table-vs-prose verification, and the 4-Lens Pro Studio.</p>
-        </div>
-      </div>
-
-      <div tabindex="0" role="region" aria-labelledby="compare-caption" class="table-wrapper">
-        <table>
-          <caption id="compare-caption">Capability ledger: PaperGuard Lite vs. PaperGuard Pro</caption>
-          <thead>
-            <tr>
-              <th scope="col">Capability</th>
-              <th scope="col">PaperGuard Lite (Free MIT)</th>
-              <th scope="col">PaperGuard Pro ($29 One-Time)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Mac &amp; Windows Local App + One-Click IDE Installer</th>
-              <td class="cell-ok">Included</td>
-              <td class="cell-ok">Included (+ Flawed Paper Demo &amp; repaired .bib export)</td>
-            </tr>
-            <tr>
-              <th scope="row">Zero pip install (Python 3.11+ + vendored pylatexenc)</th>
-              <td class="cell-ok">Yes</td>
-              <td class="cell-ok">Yes</td>
-            </tr>
-            <tr>
-              <th scope="row">Math-Masked AI Cliché &amp; Style Diagnostics</th>
-              <td class="cell-ok">Read-only scan</td>
-              <td class="cell-ok">156-entry Academic Style Bank + De-AI workflow</td>
-            </tr>
-            <tr>
-              <th scope="row">5-Source BibTeX Verification (Crossref, DataCite, OpenAlex, DBLP, arXiv)</th>
-              <td>Read-only alerts</td>
-              <td class="cell-ok">Lossless span patching + <code>bibtex</code> .bbl oracle</td>
-            </tr>
-            <tr>
-              <th scope="row">arXiv → NeurIPS / ICLR / ACL Preprint Upgrades</th>
-              <td>Candidate note</td>
-              <td class="cell-ok">Identity-checked auto-upgrade (retains <code>eprint</code>)</td>
-            </tr>
-            <tr>
-              <th scope="row">LaTeX Formula, Label &amp; Citation Guard (<code>latex_guard.py</code>)</th>
-              <td class="cell-muted">—</td>
-              <td class="cell-ok">SHA-256 lockfile + AST check + optional <code>--fls</code></td>
-            </tr>
-            <tr>
-              <th scope="row">Cell-Bound Table vs. Prose Contradiction Linter</th>
-              <td class="cell-muted">—</td>
-              <td class="cell-ok">Absolute, metric-bound <code>%</code>, and <code>pp</code> checks</td>
-            </tr>
-            <tr>
-              <th scope="row">Reviewer-2 Venue Rubrics (incl. NeurIPS 2026) &amp; Rebuttal Triage</th>
-              <td class="cell-muted">—</td>
-              <td class="cell-ok">Included (evidence-bound <code>[TODO_EXPERIMENT]</code>)</td>
-            </tr>
-            <tr>
-              <th scope="row">Offline HTML Workbench</th>
-              <td>Diagnostic Audit UI</td>
-              <td class="cell-ok">Full 4-Lens Word-Diff Studio</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p class="ScopeNote">
-        <strong>Static scope note:</strong> <code>latex_guard.py</code> confirms checked formulas, labels, and citations are unchanged; full TeX compilation is verified separately with your local compiler (<code>pdflatex</code>/<code>latexmk</code>), and local brace-scoped macro/register redefinitions, <code>\documentclass[opts]</code> forwarding to custom packages, and unbraced register forms are outside static scope.
-      </p>
+  <section class="preview" aria-label="PaperGuard Studio preview">
+    <h2 class="section-title">Built for quiet, high-density reading.</h2>
+    <p class="section-lead">Word-level diffs, BibTeX evidence, and Reviewer-2 checklists in a single offline HTML file.</p>
+    <div class="preview-frame">
+      <img
+        src="assets/studio-pro-preview.png"
+        alt="PaperGuard Pro 4-Lens Obsidian Ink Studio showing word-level diffs, Formula guard passed, and synchronized audit tabs"
+        width="1440"
+        height="900"
+        fetchpriority="high"
+      >
+    </div>
+    <div class="preview-links">
+      <a class="quiet-link" href="./demo-studio.html" target="_blank" rel="noopener">Explore Pro Studio Demo ↗</a>
+      <a class="quiet-link" href="./demo-lite.html" target="_blank" rel="noopener">Explore Lite Report Demo ↗</a>
     </div>
   </section>
 
-  <section id="privacy" class="Section" aria-labelledby="privacy-heading">
-    <div class="wrap">
-      <div class="SectionHead">
+  <section id="editions" class="editions" aria-labelledby="editions-heading">
+    <div class="editions-head">
+      <h2 id="editions-heading" class="section-title">Start free. Upgrade once.</h2>
+      <p class="section-lead">No subscriptions, no accounts, no cloud lock-in.</p>
+    </div>
+
+    <div class="tier-grid">
+      <div class="tier">
         <div>
-          <span class="SectionNum">05 · Privacy &amp; Safety Guarantees</span>
-          <h2 id="privacy-heading">Unpublished manuscripts never leave your machine</h2>
-          <p>Designed for double-blind submissions and embargoed research—zero accounts, zero cloud backend, zero telemetry.</p>
+          <div class="tier-top">
+            <h3>PaperGuard Lite</h3>
+            <span class="price">Free</span>
+          </div>
+          <p class="tier-desc">MIT open-source diagnostic workbench</p>
+          <ul class="tier-list">
+            <li>Mac &amp; Windows double-click local app + IDE installer</li>
+            <li>Read-only 5-source BibTeX &amp; retraction diagnostics</li>
+            <li>Math-masked AI cliché &amp; style scanner</li>
+            <li>Offline HTML audit report (0 external requests)</li>
+            <li>Claude Code, Antigravity &amp; Cursor skill included</li>
+          </ul>
         </div>
+        <a class="btn" href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0.zip">Download Lite Free</a>
       </div>
 
-      <div class="Grid3">
-        <article class="Card">
-          <span class="CardTag">127.0.0.1 Loopback Only</span>
-          <h3>Air-gapped by default</h3>
-          <p>The local app refuses non-loopback hosts, enforces per-request CSP nonces and CSRF tokens on every POST, and generates standalone HTML reports with <strong>0 external requests</strong>.</p>
-        </article>
-        <article class="Card">
-          <span class="CardTag">Opt-In Metadata Lookup</span>
-          <h3>Never sends manuscript prose</h3>
-          <p>When online <code>.bib</code> lookup is enabled, only citation metadata (DOI, title, author) is queried against public Crossref, DataCite, OpenAlex, DBLP, and arXiv endpoints.</p>
-        </article>
-        <article class="Card">
-          <span class="CardTag">Non-Destructive I/O</span>
-          <h3>Source files cannot be overwritten</h3>
-          <p>Every CLI output entry point refuses to write over declared manuscript or multi-database <code>.bib</code> inputs (verified across a 28-case overwrite matrix), and the local app works strictly on temp copies.</p>
-        </article>
+      <div class="tier tier-pro">
+        <div>
+          <div class="tier-top">
+            <h3>PaperGuard Pro</h3>
+            <span class="price">$29</span>
+          </div>
+          <p class="tier-desc">One-time download · full verification &amp; repair suite</p>
+          <ul class="tier-list">
+            <li>Everything in Lite, plus bundled Flawed Paper Demo</li>
+            <li>Lossless <code>.bib</code> span patching &amp; arXiv venue upgrades</li>
+            <li><code>latex_guard.py</code> SHA-256 formula &amp; citation lockfiles</li>
+            <li>Cell-bound table-vs-prose numeric linter (<code>%</code>, <code>pp</code>, units)</li>
+            <li>4-Lens Word-Diff Studio, NeurIPS 2026 rubrics &amp; Rebuttal</li>
+          </ul>
+        </div>
+        <a class="btn btn-primary" href="https://zhangx2.gumroad.com/l/paperguard-pro" target="_blank" rel="noopener">Unlock PaperGuard Pro · $29 →</a>
       </div>
     </div>
-  </section>
 
-  <section class="Section">
-    <div class="wrap DualCta">
-      <div class="TierCard">
-        <div>
-          <span class="Badge Badge-muted">FREE · MIT LICENSE</span>
-          <h2 style="font-size:24px;margin-top:10px">PaperGuard Lite</h2>
-          <div class="TierPrice" style="margin:6px 0">$0</div>
-          <p class="TierSub">Mac &amp; Windows local app, read-only BibTeX forensics, math-masked AI cliché scanner, offline HTML audit UI, and IDE skills for Antigravity, Claude Code, and Cursor.</p>
-        </div>
-        <div class="CtaRow" style="margin-bottom:0">
-          <a class="Btn Btn-accent" href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0.zip">Download Free ZIP</a>
-          <a class="Btn" href="https://github.com/paperguard-app/paperguard" target="_blank" rel="noopener">View GitHub Source</a>
-        </div>
+    <details class="spec-details">
+      <summary>Technical details, privacy &amp; static guard scope</summary>
+      <div class="spec-body">
+        <p><strong>Zero dependencies:</strong> Runs on Python 3.11+ standard library with vendored MIT <code>pylatexenc 2.11</code>. Optional local <code>bibtex</code>, <code>--fls</code> (TeX <code>-recorder</code>), <code>--aux</code>, and <code>pandoc</code> oracles activate automatically when installed.</p>
+        <p><strong>Data handling:</strong> Local apps bind strictly to <code>127.0.0.1</code> with per-session CSRF tokens and CSP nonces. Online BibTeX verification is opt-in and sends only citation metadata (DOI, title, author) to public Crossref, DataCite, OpenAlex, DBLP, and arXiv endpoints—never manuscript prose.</p>
+        <p><strong>Static guard boundaries:</strong> <code>latex_guard.py</code> confirms checked formulas, labels, and citations are unchanged; full TeX compilation is verified separately by <code>pdflatex</code>/<code>latexmk</code>. Local brace-scoped macro/register redefinitions, <code>\documentclass[opts]</code> forwarding to custom packages, and unbraced register forms are outside static simulation scope.</p>
       </div>
-
-      <div class="TierCard TierCard-pro">
-        <div>
-          <span class="Badge">ONE-TIME DOWNLOAD · NO SUBSCRIPTION</span>
-          <h2 style="font-size:24px;margin-top:10px">PaperGuard Pro</h2>
-          <div class="TierPrice" style="margin:6px 0">$29</div>
-          <p class="TierSub">Everything in Lite plus lossless <code>.bib</code> span patching, <code>latex_guard.py</code> SHA-256 formula lockfiles, cell-bound table consistency linter, Reviewer-2 NeurIPS 2026 rubrics, Rebuttal Architect, and 4-Lens Word-Diff Studio.</p>
-        </div>
-        <div class="CtaRow" style="margin-bottom:0">
-          <a class="Btn Btn-vermilion" href="https://zhangx2.gumroad.com/l/paperguard-pro" target="_blank" rel="noopener">Unlock PaperGuard Pro · $29 →</a>
-          <a class="Btn" href="./demo-studio.html" target="_blank" rel="noopener">Try Pro Studio Demo ↗</a>
-        </div>
-      </div>
-    </div>
+    </details>
   </section>
 </main>
 
 <footer>
-  <div class="wrap FooterInner">
-    <span>PaperGuard v2.5.0 · Archival Paper &amp; Obsidian Ink · Vendored pylatexenc 2.11 (MIT)</span>
-    <div class="FooterLinks">
-      <a href="https://github.com/paperguard-app/paperguard" target="_blank" rel="noopener">GitHub</a>
-      <a href="./demo-studio.html" target="_blank" rel="noopener">Pro Demo</a>
-      <a href="./demo-lite.html" target="_blank" rel="noopener">Lite Demo</a>
-      <a href="https://zhangx2.gumroad.com/l/paperguard-pro" target="_blank" rel="noopener">Gumroad ($29)</a>
-    </div>
+  <span>PaperGuard v2.5.0 · Archival Paper &amp; Obsidian Ink</span>
+  <div class="foot-links">
+    <a href="https://github.com/paperguard-app/paperguard" target="_blank" rel="noopener">GitHub</a>
+    <a href="./demo-studio.html" target="_blank" rel="noopener">Live Demo</a>
+    <a href="https://zhangx2.gumroad.com/l/paperguard-pro" target="_blank" rel="noopener">Pro ($29)</a>
   </div>
 </footer>
 
 <script>
 (function () {
   "use strict";
+
+  // Two-state color-scheme toggle reverting to system light dark
   const themeMeta = document.querySelector('meta[name="color-scheme"]');
   const themeBtn = document.getElementById("themeToggle");
   function systemIsDark() {
@@ -1145,6 +1003,101 @@ cd paperguard
     refreshThemeLabel();
   });
 
+  // Accessible tablists (selection follows focus, roving tabindex, hidden="until-found" + beforematch)
+  const winFile = document.getElementById("winFile");
+  function initTablist(tablist, onSelect) {
+    const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+    const panels = tabs.map(function (t) {
+      return document.querySelector('[role="tabpanel"][aria-labelledby="' + t.id + '"]');
+    });
+
+    function activate(idx, moveFocus) {
+      tabs.forEach(function (t, i) {
+        const active = i === idx;
+        t.setAttribute("aria-selected", active ? "true" : "false");
+        t.tabIndex = active ? 0 : -1;
+        const p = panels[i];
+        if (p) {
+          if (active) {
+            p.removeAttribute("hidden");
+            p.tabIndex = 0;
+          } else {
+            p.setAttribute("hidden", "until-found");
+            p.removeAttribute("tabindex");
+          }
+        }
+      });
+      const sel = tabs[idx];
+      if (sel && sel.scrollIntoView) {
+        sel.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
+      if (moveFocus && sel) sel.focus();
+      if (onSelect) onSelect(idx, sel);
+    }
+
+    tabs.forEach(function (tab, idx) {
+      tab.addEventListener("click", function () { activate(idx, false); });
+      tab.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight") { e.preventDefault(); activate((idx + 1) % tabs.length, true); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); activate((idx - 1 + tabs.length) % tabs.length, true); }
+        else if (e.key === "Home") { e.preventDefault(); activate(0, true); }
+        else if (e.key === "End") { e.preventDefault(); activate(tabs.length - 1, true); }
+      });
+    });
+
+    panels.forEach(function (panel, idx) {
+      if (!panel) return;
+      panel.addEventListener("beforematch", function () { activate(idx, false); });
+    });
+
+    return { activate: activate, count: tabs.length };
+  }
+
+  // Showcase gentle auto-cycle (pauses on user hover/focus/click, disabled under prefers-reduced-motion)
+  const showcaseList = document.querySelector('[data-tabs="showcase"]');
+  const progressBar = document.getElementById("showcaseProgress");
+  const showcaseWin = document.getElementById("showcaseWindow");
+  let activeIdx = 0;
+  let userInteracted = false;
+  let paused = false;
+  let elapsed = 0;
+  const CYCLE_MS = 6000;
+
+  const showcaseApi = initTablist(showcaseList, function (idx, tabEl) {
+    activeIdx = idx;
+    elapsed = 0;
+    if (progressBar) progressBar.style.width = "0%";
+    if (winFile && tabEl && tabEl.dataset.file) {
+      winFile.textContent = tabEl.dataset.file;
+    }
+  });
+
+  if (showcaseWin) {
+    showcaseWin.addEventListener("pointerenter", function () { paused = true; });
+    showcaseWin.addEventListener("pointerleave", function () { paused = false; });
+    showcaseWin.addEventListener("focusin", function () { paused = true; });
+    showcaseWin.addEventListener("focusout", function () { paused = false; });
+    showcaseList.addEventListener("click", function () { userInteracted = true; if (progressBar) progressBar.style.width = "0%"; });
+    showcaseList.addEventListener("keydown", function () { userInteracted = true; if (progressBar) progressBar.style.width = "0%"; });
+  }
+
+  const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reducedMotion && showcaseApi) {
+    setInterval(function () {
+      if (userInteracted || paused || document.hidden) return;
+      elapsed += 200;
+      if (progressBar) progressBar.style.width = Math.min(100, (elapsed / CYCLE_MS) * 100) + "%";
+      if (elapsed >= CYCLE_MS) {
+        showcaseApi.activate((activeIdx + 1) % showcaseApi.count, false);
+      }
+    }, 200);
+  }
+
+  // Usage platform switcher
+  const usageList = document.querySelector('[data-tabs="usage"]');
+  if (usageList) initTablist(usageList);
+
+  // Copy CLI command
   const copyBtn = document.getElementById("copyGitBtn");
   const copyStatus = document.getElementById("copyStatus");
   const gitCmd = document.getElementById("gitCmd");
@@ -1152,8 +1105,10 @@ cd paperguard
     copyBtn.addEventListener("click", async function () {
       try {
         await navigator.clipboard.writeText(gitCmd.textContent.trim());
-        copyStatus.textContent = "Copied!";
-        setTimeout(function () { copyStatus.textContent = ""; }, 2000);
+        copyStatus.textContent = "Copied to clipboard.";
+        setTimeout(function () {
+          copyStatus.textContent = "Creates .orig.bak backups & preserves custom Cursor .mdc rules.";
+        }, 2000);
       } catch (_) {
         copyStatus.textContent = "Select and copy the command above.";
       }
