@@ -13,6 +13,9 @@ try {
 } catch (_) {}
 </script>
 <title>PaperGuard — A calm pre-submission guard for LaTeX &amp; Markdown</title>
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <meta name="description" content="Verify citations, lock every equation, and catch table contradictions — locally, before Reviewer 2 does. Zero pip install, offline-first for macOS, Windows, Claude Code, Antigravity &amp; Cursor.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="PaperGuard — A calm pre-submission guard for LaTeX &amp; Markdown">
@@ -92,11 +95,21 @@ code {
   gap: 16px;
 }
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   font-family: var(--serif);
   font-size: 19px;
   font-weight: 600;
   text-decoration: none;
   letter-spacing: -0.01em;
+}
+.brand-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 5.5px;
+  box-shadow: light-dark(0 1px 3px rgba(24,23,21,0.14), 0 1px 4px rgba(0,0,0,0.45));
 }
 .nav-links {
   display: flex;
@@ -716,7 +729,7 @@ footer {
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="#">PaperGuard</a>
+  <a class="brand" href="#"><img class="brand-icon" src="assets/favicon-64.png" alt="" width="24" height="24"><span>PaperGuard</span></a>
   <nav class="nav-links" aria-label="Primary">
     <a href="#how">Install</a>
     <a href="#editions">Editions</a>
