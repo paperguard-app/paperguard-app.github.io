@@ -743,7 +743,7 @@ footer {
     <h1>A calm pre-submission guard for LaTeX &amp; Markdown.</h1>
     <p class="hero-sub">Verify citations, lock every equation, and catch table contradictions — locally, before Reviewer 2 does.</p>
     <div class="actions">
-      <a class="btn btn-primary" href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0.zip">Download Free</a>
+      <a class="btn btn-primary" data-dl-primary href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0-macOS.dmg">Download Free App</a>
       <a class="btn" href="https://zhangx2.gumroad.com/l/paperguard-pro" target="_blank" rel="noopener">PaperGuard Pro · $29</a>
     </div>
     <a class="quiet-link" href="./demo-studio.html" target="_blank" rel="noopener">Try the interactive 4-Lens Studio in your browser →</a>
@@ -937,7 +937,7 @@ cd paperguard
             <li>Claude Code, Antigravity &amp; Cursor skill included</li>
           </ul>
         </div>
-        <a class="btn" href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0.zip">Download Lite Free</a>
+        <a class="btn" data-dl-primary href="https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0-macOS.dmg">Download Lite Free</a>
       </div>
 
       <div class="tier tier-pro">
@@ -1109,6 +1109,15 @@ cd paperguard
   // Usage platform switcher
   const usageList = document.querySelector('[data-tabs="usage"]');
   if (usageList) initTablist(usageList);
+
+  // Auto-select macOS .dmg vs Windows/Linux .zip for primary download buttons
+  const ua = (navigator.userAgent || "").toLowerCase();
+  const isWinOrLinux = ua.includes("windows") || (ua.includes("linux") && !ua.includes("mac"));
+  if (isWinOrLinux) {
+    document.querySelectorAll("[data-dl-primary]").forEach(function (el) {
+      el.href = "https://github.com/paperguard-app/paperguard/releases/latest/download/PaperGuard-Lite-v2.5.0.zip";
+    });
+  }
 
   // Copy CLI command
   const copyBtn = document.getElementById("copyGitBtn");
